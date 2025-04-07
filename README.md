@@ -1,87 +1,84 @@
-Here’s a clean list of Git commands mentioned in your handwritten notes, organized by sections:
+Got it! Here's a filtered list of the most important and commonly used Git commands — ideal for daily development and interviews:
 
 
 ---
 
-Initializing a Repo
+1. Setup
 
-git init  # Initialize a Git repository in the root directory
-
-
----
-
-Staging Files
-
-git add file1.js  # Stage a single file
-git add file1.js file2.js  # Stage multiple files
-git add *.js  # Stage files matching a pattern
-git add .  # Stage entire directory (all content)
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
 
 
 ---
 
-Viewing the Status
+2. Initialize & Clone
 
-git status  # Full status
-git status -s  # Short status
-
-
----
-
-Configuring Git
-
-git config --global user.name "My name"
-git config --global user.email "someone@email.com"
-git config --list  # List current configuration
+git init                          # Initialize a Git repo
+git clone <repo-url>             # Clone a repo from GitHub
 
 
 ---
 
-Push Command
+3. Basic Workflow
 
-git push origin main  # Push local repo content to remote repo
-
-
----
-
-Init Command (Full Flow)
-
-git init
-git remote add origin <link>
-git remote -v  # Verify remote link
-git branch  # Check branch
-git branch -M main  # Rename branch to main
-git push origin main
+git status                       # Check current changes
+git add <file>                   # Stage a file
+git add .                        # Stage all files
+git commit -m "message"          # Commit with message
 
 
 ---
 
-Directory Navigation
+4. Branching
 
-cd ..  # Go out of the folder
-mkdir LocalRepo  # Make a new folder
-
-
----
-
-Branch Operations
-
-git branch  # Check branches
-git branch -M main  # Rename current branch to main
-git checkout <branch_name>  # Navigate to existing branch
-git checkout -b <branch_name>  # Create and switch to new branch
-git branch -d <branch_name>  # Delete a branch
+git branch                       # List branches
+git branch <branch-name>         # Create branch
+git checkout <branch-name>       # Switch branch
+git checkout -b <branch-name>    # Create + switch branch
 
 
 ---
 
-Setting Upstream (Push Shortcut)
+5. Merging & Pulling
 
-git push -u origin main  # Set upstream so you can later just use 'git push'
+git merge <branch>               # Merge into current branch
+git pull origin <branch>         # Pull latest from remote
 
 
 ---
 
-Let me know if you want these in a downloadable format (PDF/Markdown).
+6. Pushing
 
+git push origin <branch>         # Push branch to remote
+git push -u origin <branch>      # First time push with upstream
+
+
+---
+
+7. Undo Changes
+
+git reset <file>                 # Unstage file
+git checkout -- <file>           # Discard local changes
+git reset --hard                 # Reset everything to last commit
+
+
+---
+
+8. Logs & History
+
+git log                          # View commit history
+git log --oneline                # Compact log
+
+
+---
+
+9. Stashing
+
+git stash                        # Save uncommitted changes
+git stash apply                  # Re-apply stash
+
+
+---
+
+Would you like me to convert this into a cheat sheet PDF or add a few interview-specific commands too?
 
