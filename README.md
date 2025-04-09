@@ -1,84 +1,146 @@
-Got it! Here's a filtered list of the most important and commonly used Git commands — ideal for daily development and interviews:
+Perfect! Let's build a simple Spring Boot application with a small REST API and test it step by step.
 
 
 ---
 
-1. Setup
+Goal:
 
-git config --global user.name "Your Name"
-git config --global user.email "your@email.com"
-
-
----
-
-2. Initialize & Clone
-
-git init                          # Initialize a Git repo
-git clone <repo-url>             # Clone a repo from GitHub
+We’ll build a mini app with a /test endpoint that returns a welcome message.
 
 
 ---
 
-3. Basic Workflow
+Step-by-step Project Structure + Code
 
-git status                       # Check current changes
-git add <file>                   # Stage a file
-git add .                        # Stage all files
-git commit -m "message"          # Commit with message
+1. Project Structure
 
-
----
-
-4. Branching
-
-git branch                       # List branches
-git branch <branch-name>         # Create branch
-git checkout <branch-name>       # Switch branch
-git checkout -b <branch-name>    # Create + switch branch
-
-
----
-
-5. Merging & Pulling
-
-git merge <branch>               # Merge into current branch
-git pull origin <branch>         # Pull latest from remote
+SpringBootApp/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── com/
+│       │       └── example/
+│       │           └── SpringBootAppApplication.java
+│       │           └── controller/
+│       │               └── TestController.java
+│       └── resources/
+│           └── application.properties
+├── pom.xml
 
 
 ---
 
-6. Pushing
+2. pom.xml
 
-git push origin <branch>         # Push branch to remote
-git push -u origin <branch>      # First time push with upstream
+Basic file to include Spring Boot Web:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>spring-boot-app</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>SpringBootApp</name>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.5</version>
+    </parent>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <dependencies>
+        <!-- Spring Boot Starter Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
 
 
 ---
 
-7. Undo Changes
+3. SpringBootAppApplication.java
 
-git reset <file>                 # Unstage file
-git checkout -- <file>           # Discard local changes
-git reset --hard                 # Reset everything to last commit
+package com.example;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
----
-
-8. Logs & History
-
-git log                          # View commit history
-git log --oneline                # Compact log
-
-
----
-
-9. Stashing
-
-git stash                        # Save uncommitted changes
-git stash apply                  # Re-apply stash
+@SpringBootApplication
+public class SpringBootAppApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootAppApplication.class, args);
+    }
+}
 
 
 ---
 
-Would you like me to convert this into a cheat sheet PDF or add a few interview-specific commands too?
+4. TestController.java
+
+package com.example.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class TestController {
+
+    @GetMapping("/test")
+    public String getTestMessage() {
+        return "Spring Boot is working fine!";
+    }
+}
+
+
+---
+
+5. application.properties (Optional)
+
+# src/main/resources/application.properties
+server.port=8080
+
+
+---
+
+✅ How to Run
+
+1. Right-click SpringBootAppApplication.java and run it.
+
+
+2. Open browser or Postman:
+
+http://localhost:8080/test
+
+
+3. You’ll see:
+
+Spring Boot is working fine!
+
+
+
+
+---
+
+Would you like me to zip and share a complete ready-to-import IntelliJ project for this?
+
 
