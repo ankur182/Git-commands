@@ -1,3 +1,45 @@
+package com.example.helloworld.service;
+
+import com.example.helloworld.model.Employee;
+import com.example.helloworld.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository repository;
+
+    public Employee save(Employee employee) {
+        return repository.save(employee);
+    }
+
+    public List<Employee> getAll() {
+        return repository.findAll();
+    }
+
+    public Optional<Employee> getById(Long id) {
+        return repository.findById(id);
+    }
+
+    public Employee update(Long id, Employee updated) {
+        Employee emp = repository.findById(id).orElseThrow();
+        emp.setName(updated.getName());
+        emp.setDepartment(updated.getDepartment());
+        emp.setSalary(updated.getSalary());
+        return repository.save(emp);
+    }
+
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+}
+
+
 Based on your current Spring Boot project structure (as seen in the image), here's how to structure your project to add the Employee CRUD functionality with H2 database:
 
 
