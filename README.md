@@ -1,3 +1,51 @@
+🤣
+package com.example.helloworld.controller;
+
+import com.example.helloworld.model.Employee;
+import com.example.helloworld.service.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService service;
+
+    @PostMapping
+    public Employee create(@RequestBody Employee employee) {
+        return service.save(employee);
+    }
+
+    @GetMapping
+    public List<Employee> getAll() {
+        return service.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Employee> getById(@PathVariable Long id) {
+        return service.getById(id);
+    }
+
+    @PutMapping("/{id}")
+    public Employee update(@PathVariable Long id, @RequestBody Employee employee) {
+        return service.update(id, employee);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
+}
+🤣
+
+
+
+
 package com.example.helloworld.service;
 
 import com.example.helloworld.model.Employee;
