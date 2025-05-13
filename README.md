@@ -1,9 +1,4 @@
-Here is the complete working code for a OneToOne mapping using Spring Boot and H2 database, from scratch. This uses a User and Profile relationship where each user has exactly one profile.
-
-
----
-
-1. pom.xml
+pom.xml
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -35,9 +30,8 @@ Here is the complete working code for a OneToOne mapping using Spring Boot and H
 </project>
 
 
----
+--_-------------
 
-2. application.properties
 
 spring.datasource.url=jdbc:h2:mem:testdb
 spring.datasource.driverClassName=org.h2.Driver
@@ -49,9 +43,7 @@ spring.h2.console.enabled=true
 spring.h2.console.path=/h2-console
 
 
----
-
-3. User.java
+----------+-+----
 
 package com.example.demo.model;
 
@@ -81,9 +73,7 @@ public class User {
 }
 
 
----
-
-4. Profile.java
+-----_-----------
 
 package com.example.demo.model;
 
@@ -106,10 +96,7 @@ public class Profile {
 }
 
 
----
-
-5. UserRepository.java
-
+_---------+--------
 package com.example.demo.repository;
 
 import com.example.demo.model.User;
@@ -119,10 +106,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 }
 
 
----
 
-6. UserController.java
-
+---------------------
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
@@ -150,11 +135,7 @@ public class UserController {
     }
 }
 
-
----
-
-7. DemoApplication.java
-
+------------------
 package com.example.demo;
 
 import org.springframework.boot.SpringApplication;
@@ -168,47 +149,4 @@ public class DemoApplication {
 }
 
 
----
-
-8. Sample Request for Testing (POST /users)
-
-URL: http://localhost:8080/users
-Body (JSON):
-
-{
-  "username": "ankur",
-  "profile": {
-    "bio": "Spring Boot Developer"
-  }
-}
-
-
----
-
-Optional: Access H2 Console
-
-Go to: http://localhost:8080/h2-console
-
-JDBC URL: jdbc:h2:mem:testdb
-
-Username: sa
-
-Password: (leave blank)
-
-
-
----
-
-Let me know if you want:
-
-Bidirectional OneToOne mapping
-
-Add UserService
-
-Validation or error handling
-
-Frontend for this API
-
-
-I'm happy to help!
-
+---++++-------
