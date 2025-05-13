@@ -1,228 +1,161 @@
-🤣
-package com.example.helloworld.controller;
-
-import com.example.helloworld.model.Employee;
-import com.example.helloworld.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
-
-@RestController
-@RequestMapping("/api/employees")
-public class EmployeeController {
-
-    @Autowired
-    private EmployeeService service;
-
-    @PostMapping
-    public Employee create(@RequestBody Employee employee) {
-        return service.save(employee);
-    }
-
-    @GetMapping
-    public List<Employee> getAll() {
-        return service.getAll();
-    }
-
-    @GetMapping("/{id}")
-    public Optional<Employee> getById(@PathVariable Long id) {
-        return service.getById(id);
-    }
-
-    @PutMapping("/{id}")
-    public Employee update(@PathVariable Long id, @RequestBody Employee employee) {
-        return service.update(id, employee);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
-    }
-}
-🤣
-
-
-
-
-package com.example.helloworld.service;
-
-import com.example.helloworld.model.Employee;
-import com.example.helloworld.repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-
-@Service
-public class EmployeeService {
-
-    @Autowired
-    private EmployeeRepository repository;
-
-    public Employee save(Employee employee) {
-        return repository.save(employee);
-    }
-
-    public List<Employee> getAll() {
-        return repository.findAll();
-    }
-
-    public Optional<Employee> getById(Long id) {
-        return repository.findById(id);
-    }
-
-    public Employee update(Long id, Employee updated) {
-        Employee emp = repository.findById(id).orElseThrow();
-        emp.setName(updated.getName());
-        emp.setDepartment(updated.getDepartment());
-        emp.setSalary(updated.getSalary());
-        return repository.save(emp);
-    }
-
-    public void delete(Long id) {
-        repository.deleteById(id);
-    }
-}
-
-
-Based on your current Spring Boot project structure (as seen in the image), here's how to structure your project to add the Employee CRUD functionality with H2 database:
+Here’s a complete working Spring Boot + Hibernate @OneToOne example using H2 Database for simplicity.
 
 
 ---
 
-Updated Project Structure
+1. Project Structure
 
-src/
- └── main/
-     └── java/
-         └── com.example.helloworld/
-             ├── controller/
-             │   └── EmployeeController.java
-             ├── model/
-             │   └── Employee.java
-             ├── repository/
-             │   └── EmployeeRepository.java
-             ├── HelloWorldSpringApplication.java
-     └── resources/
-         ├── application.properties
-         └── static/
+src
+└── main
+    └── java
+        └── com.example.demo
+            ├── DemoApplication.java
+            ├── model
+            │   ├── User.java
+            │   └── Profile.java
+            ├── repository
+            │   └── UserRepository.java
+            └── controller
+                └── UserController.java
+    └── resources
+        └── application.properties
 
 
 ---
 
-1. Employee Entity (model/Employee.java)
+2. User Entity
 
-package com.example.helloworld.model;
+package com.example.demo.model;
 
 import jakarta.persistence.*;
 
 @Entity
-public class Employee {
-    
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-    private String department;
-    private double salary;
 
-    public Employee() {}
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id", referencedColumnName = "id")
+    private Profile profile;
 
-    public Employee(String name, String department, double salary) {
-        this.name = name;
-        this.department = department;
-        this.salary = salary;
-    }
-
-    // Getters and setters
-    // ...
+    // Getters and Setters
 }
 
 
 ---
 
-2. Employee Repository (repository/EmployeeRepository.java)
+3. Profile Entity
 
-package com.example.helloworld.repository;
+package com.example.demo.model;
 
-import com.example.helloworld.model.Employee;
+import jakarta.persistence.*;
+
+@Entity
+public class Profile {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String bio;
+
+    // Getters and Setters
+}
+
+
+---
+
+4. User Repository
+
+package com.example.demo.repository;
+
+import com.example.demo.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 }
 
 
 ---
 
-3. Employee Controller (controller/EmployeeController.java)
+5. User Controller
 
-package com.example.helloworld.controller;
+package com.example.demo.controller;
 
-import com.example.helloworld.model.Employee;
-import com.example.helloworld.repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.model.Profile;
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/employees")
-public class EmployeeController {
+@RequestMapping("/users")
+public class UserController {
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
 
-    @GetMapping
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @PostMapping
-    public Employee createEmployee(@RequestBody Employee employee) {
-        return employeeRepository.save(employee);
+    public User createUser(@RequestBody User user) {
+        return userRepository.save(user);
     }
 
     @GetMapping("/{id}")
-    public Employee getEmployeeById(@PathVariable Long id) {
-        return employeeRepository.findById(id).orElse(null);
-    }
-
-    @PutMapping("/{id}")
-    public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee newEmp) {
-        return employeeRepository.findById(id).map(emp -> {
-            emp.setName(newEmp.getName());
-            emp.setDepartment(newEmp.getDepartment());
-            emp.setSalary(newEmp.getSalary());
-            return employeeRepository.save(emp);
-        }).orElse(null);
-    }
-
-    @DeleteMapping("/{id}")
-    public String deleteEmployee(@PathVariable Long id) {
-        employeeRepository.deleteById(id);
-        return "Employee deleted with id: " + id;
+    public User getUser(@PathVariable Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 }
 
 
 ---
 
-4. application.properties
+6. application.properties
 
 spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.driverClassName=org.h2.Driver
 spring.datasource.username=sa
 spring.datasource.password=
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.h2.console.enabled=true
+spring.jpa.hibernate.ddl-auto=update
 
 
 ---
 
-Once this is ready, let me know and I’ll guide you through Postman API testing step-by-step. Do you want me to write the JSON payloads next?
+7. DemoApplication.java
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+
+---
+
+Test with JSON (POST /users)
+
+{
+  "name": "John",
+  "profile": {
+    "bio": "Software Engineer"
+  }
+}
+
+This will insert both User and Profile in the database and link them.
+
+
+---
+
+Let me know if you'd like this as a downloadable zip or deployed via Spring Initializr.
 
