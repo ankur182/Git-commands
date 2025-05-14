@@ -1,3 +1,102 @@
+@RestController
+@RequestMapping("/employers")
+public class EmployerController {
+
+    @Autowired
+    private EmployerRepository employerRepo;
+
+    @PostMapping
+    public Employer createEmployer(@RequestBody Employer employer) {
+        if (employer.getEmployees() != null) {
+            employer.getEmployees().forEach(emp -> emp.setEmployer(employer));
+        }
+        return employerRepo.save(employer);
+    }
+
+    @GetMapping
+    public List<Employer> getAllEmployers() {
+        return employerRepo.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Employer> getEmployerById(@PathVariable int id) {
+        return employerRepo.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Employer> updateEmployer(@PathVariable int id, @RequestBody Employer updatedEmployer) {
+        return employerRepo.findById(id).map(employer -> {
+            employer.setPanNo(updatedEmployer.getPanNo());
+            employer.setEstDate(updatedEmployer.getEstDate());
+            employer.setLocation(updatedEmployer.getLocation());
+            return ResponseEntity.ok(employerRepo.save(employer));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployer(@PathVariable int id) {
+        if (employerRepo.existsById(id)) {
+            employerRepo.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+}
+
+------+++++++++
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeRepository employeeRepo;
+
+    @Autowired
+    private EmployerRepository employerRepo;
+
+    @PostMapping("/{employerId}")
+    public ResponseEntity<Employee> createEmployee(@PathVariable int employerId, @RequestBody Employee employee) {
+        return employerRepo.findById(employerId).map(employer -> {
+            employee.setEmployer(employer);
+            return ResponseEntity.ok(employeeRepo.save(employee));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public List<Employee> getAllEmployees() {
+        return employeeRepo.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable int id) {
+        return employeeRepo.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable int id, @RequestBody Employee updatedEmployee) {
+        return employeeRepo.findById(id).map(emp -> {
+            emp.setName(updatedEmployee.getName());
+            emp.setJob(updatedEmployee.getJob());
+            emp.setSalary(updatedEmployee.getSalary());
+            return ResponseEntity.ok(employeeRepo.save(emp));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable int id) {
+        if (employeeRepo.existsById(id)) {
+            employeeRepo.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+}
+
+_------+-++-
 Great — here's an updated and complete setup so you can fetch both Employers and their Employees using Spring Boot and H2, following a proper OneToMany (Employer → Employee) structure.
 
 
