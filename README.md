@@ -98,3 +98,103 @@ Use cascade = CascadeType.PERSIST when you want to automatically persist the chi
 Let me know if you want to test this practically or move to the next cascade type like MERGE.
 
 
+_--------------
+Perfect! Let’s now go through CascadeType.MERGE in detail with your Employer and Employee setup.
+
+
+---
+
+Scenario: Only CascadeType.MERGE
+
+@OneToMany(mappedBy = "employer", cascade = CascadeType.MERGE)
+@JsonManagedReference
+private List<Employee> employees = new ArrayList<>();
+
+
+---
+
+What MERGE does:
+
+When you update (merge) an existing Employer, it also updates the associated Employee records automatically.
+
+
+---
+
+Use Case (Postman - PUT request)
+
+Say your database already has:
+
+Employer with employerId = 1
+
+Employee with empId = 101 under this employer
+
+
+
+---
+
+Now, you send this PUT request:
+
+PUT http://localhost:8080/api/employers/1
+
+Request Body:
+
+{
+  "employerId": 1,
+  "panNo": "NEWPAN9999",
+  "estDate": "2023-03-03",
+  "location": "Mumbai",
+  "employees": [
+    {
+      "empId": 101,
+      "name": "Ankur Updated",
+      "age": 25,
+      "salary": 55000
+    }
+  ]
+}
+
+
+---
+
+What will happen:
+
+Employer’s details will be updated.
+
+Because of CascadeType.MERGE, the Employee (empId=101) will also be updated automatically.
+
+Hibernate does this using entityManager.merge() under the hood.
+
+
+
+---
+
+What if CascadeType.MERGE is NOT used?
+
+Then the Employer would be updated, but the Employee will not be updated in DB — no error will be thrown, but the child records remain unchanged unless you manually merge/update them.
+
+
+---
+
+Summary Table:
+
+Case	Cascade.MERGE Present	Cascade.MERGE Absent
+
+Updating Employer + Employee together	Both updated	Only Employer updated
+Updating only Employer	Works	Works
+Updating only Employee	No effect on Employer	No effect on Employer
+
+
+
+---
+
+Conclusion:
+
+Use CascadeType.MERGE when you want to update both parent and children in one go via the parent.
+Otherwise, you'll need to update child (Employee) entities manually.
+
+
+---
+
+Ready to move on to REMOVE next?
+
+
