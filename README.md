@@ -1,69 +1,64 @@
-Great! Let’s now look at CascadeType.SAVE_UPDATE — which is specific to Hibernate, not standard JPA.
+Perfect! Now let’s wrap it up with the most commonly used cascade setting:
 
 
 ---
 
-What is CascadeType.SAVE_UPDATE?
+CascadeType.ALL
 
-It tells Hibernate:
-“When the parent is saved or updated, also save or update the child entities.”
+What it does:
 
+CascadeType.ALL is a shortcut that applies all cascade operations to the child entities:
 
-Equivalent to a combination of CascadeType.PERSIST + CascadeType.MERGE in JPA.
-
-
----
-
-Where it's used:
-
-@OneToMany(mappedBy = "employer", cascade = org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+@OneToMany(mappedBy = "employer", cascade = CascadeType.ALL)
 @JsonManagedReference
 private List<Employee> employees = new ArrayList<>();
 
-Note:
-You must import Hibernate’s annotation:
+This means: It includes the following:
 
-import org.hibernate.annotations.Cascade;
+Included Types	Description
 
-And apply like this:
-
-@Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-
-
----
-
-Scenario in Your Case (Employer–Employee)
-
-1. Add a new Employee to an existing Employer
-
-If you modify the Employer or add new Employees, and then save Employer, Hibernate automatically saves the new Employee too.
-
-
-2. Update an Employee’s name
-
-If the Employer is updated via repository and this cascade is enabled, the Employee's updated info will also be saved.
+PERSIST	Save child when parent is saved
+MERGE	Update child when parent is updated
+REMOVE	Delete child when parent is deleted
+REFRESH	Refresh child from DB when parent is refreshed
+DETACH	Detach child when parent is detached
 
 
 
 ---
 
-What if not used?
+Real Example in Your App (Employer → Employee)
 
-You must explicitly save/update the child (Employee) using its repository.
+Suppose you send this JSON via Postman to /employers:
 
-If you forget to do that → changes in child are ignored.
+{
+  "employerId": 1,
+  "panNo": "ABCDE1234F",
+  "estDate": "2020-01-01",
+  "location": "Delhi",
+  "employees": [
+    {
+      "empId": 101,
+      "empName": "Ankur",
+      "empSalary": 50000
+    },
+    {
+      "empId": 102,
+      "empName": "Neha",
+      "empSalary": 60000
+    }
+  ]
+}
 
+Behavior with CascadeType.ALL:
 
+All employees in the list are saved automatically with the employer (PERSIST)
 
----
+If you later update any employee name and save employer → it’s also updated (MERGE)
 
-Postman Example:
+If you delete the employer → all associated employees are deleted too (REMOVE)
 
-Suppose you send a PUT request in Postman to update Employer and also change an Employee name inside the same JSON.
-
-With SAVE_UPDATE, both changes are saved automatically.
-
-Without it, only Employer updates are saved unless you save Employee separately.
+If you refresh or detach the employer → same applies to all employees (REFRESH, DETACH)
 
 
 
@@ -71,37 +66,36 @@ Without it, only Employer updates are saved unless you save Employee separately.
 
 When to Use:
 
-Use SAVE_UPDATE when:
+Use CascadeType.ALL when:
 
-You want to automatically persist or update child objects with parent.
+You always want all related child entities to follow the parent (save, update, delete, etc.)
 
-You’re using Hibernate-specific features (not portable to other JPA providers).
+You fully control both parent and child in your logic
+
+
+BUT: Be careful — deleting a parent will delete all its children too.
+
+
+---
+
+Summary:
+
+Action on Employer	Effect on Employees (with CascadeType.ALL)
+
+Save	Employees auto-saved
+Update	Employees auto-updated
+Delete	Employees auto-deleted
+Detach	Employees auto-detached
+Refresh	Employees auto-refreshed from DB
 
 
 
 ---
 
-Summary Table:
+Let me know if you'd like:
 
-Case	With SAVE_UPDATE	Without SAVE_UPDATE
+A quick side-by-side comparison table of all cascade types
 
-Save parent	Saves/updates children too	Children not saved unless explicitly
-Update child field	Auto-saved if parent saved	Ignored unless saved separately
-
+Or a Postman testing plan for each type
 
 
----
-
-Conclusion:
-
-CascadeType.SAVE_UPDATE is a Hibernate-only feature.
-
-Behaves like PERSIST + MERGE.
-
-Very helpful when you want auto-save behavior for children on parent save/update.
-
-
-
----
-
-Let me know if you want a code snippet using SAVE_UPDATE, or proceed to a final summary chart of all cascade types.
