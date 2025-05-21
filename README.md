@@ -1,112 +1,119 @@
-<databaseChangeLog
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+To run your Hibernate + Spring Boot program and check how EntityGraph works with Employer and Employee, follow these steps:
 
-    <!-- Create Employer Table -->
-    <changeSet id="1" author="dev">
-        <createTable tableName="employer">
-            <column name="employer_id" type="BIGINT">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="pan_no" type="VARCHAR(20)"/>
-            <column name="est_date" type="DATE"/>
-            <column name="location" type="VARCHAR(100)"/>
-        </createTable>
-    </changeSet>
 
-    <!-- Create Employee Table -->
-    <changeSet id="2" author="dev">
-        <createTable tableName="employee">
-            <column name="emp_id" type="BIGINT">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(100)"/>
-            <column name="age" type="INT"/>
-            <column name="salary" type="DECIMAL(10,2)"/>
-            <column name="employer_id" type="BIGINT"/>
-        </createTable>
-    </changeSet>
+---
 
-    <!-- Foreign Key -->
-    <changeSet id="3" author="dev">
-        <addForeignKeyConstraint 
-            baseTableName="employee"
-            baseColumnNames="employer_id"
-            referencedTableName="employer"
-            referencedColumnNames="employer_id"
-            constraintName="fk_emp_employer"/>
-    </changeSet>
+1. Ensure Your Entities Are Set Correctly
 
-    <!-- Insert Employers -->
-    <changeSet id="4" author="dev">
-        <insert tableName="employer">
-            <column name="employer_id" valueNumeric="1"/>
-            <column name="pan_no" value="ABC023"/>
-            <column name="est_date" valueDate="2020-01-01"/>
-            <column name="location" value="Delhi"/>
-        </insert>
-        <insert tableName="employer">
-            <column name="employer_id" valueNumeric="2"/>
-            <column name="pan_no" value="ABC045"/>
-            <column name="est_date" valueDate="2000-07-10"/>
-            <column name="location" value="Mumbai"/>
-        </insert>
-        <insert tableName="employer">
-            <column name="employer_id" valueNumeric="3"/>
-            <column name="pan_no" value="KL8232"/>
-            <column name="est_date" valueDate="2008-02-10"/>
-            <column name="location" value="Kolkata"/>
-        </insert>
-    </changeSet>
+Employer.java
 
-    <!-- Insert Employees -->
-    <changeSet id="5" author="dev">
-        <insert tableName="employee">
-            <column name="emp_id" valueNumeric="1"/>
-            <column name="name" value="Ankur"/>
-            <column name="age" valueNumeric="20"/>
-            <column name="salary" valueNumeric="60000.0"/>
-            <column name="employer_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="employee">
-            <column name="emp_id" valueNumeric="2"/>
-            <column name="name" value="Anjali"/>
-            <column name="age" valueNumeric="18"/>
-            <column name="salary" valueNumeric="30000.0"/>
-            <column name="employer_id" valueNumeric="1"/>
-        </insert>
-        <insert tableName="employee">
-            <column name="emp_id" valueNumeric="3"/>
-            <column name="name" value="Rajiv"/>
-            <column name="age" valueNumeric="28"/>
-            <column name="salary" valueNumeric="70000.0"/>
-            <column name="employer_id" valueNumeric="1"/>
-        </insert>
+@Entity
+public class Employer {
 
-        <insert tableName="employee">
-            <column name="emp_id" valueNumeric="4"/>
-            <column name="name" value="Ritik"/>
-            <column name="age" valueNumeric="22"/>
-            <column name="salary" valueNumeric="50000.0"/>
-            <column name="employer_id" valueNumeric="2"/>
-        </insert>
-        <insert tableName="employee">
-            <column name="emp_id" valueNumeric="5"/>
-            <column name="name" value="Riya"/>
-            <column name="age" valueNumeric="27"/>
-            <column name="salary" valueNumeric="45000.0"/>
-            <column name="employer_id" valueNumeric="2"/>
-        </insert>
+    @Id
+    private int employerId;
 
-        <insert tableName="employee">
-            <column name="emp_id" valueNumeric="6"/>
-            <column name="name" value="Aditya Singh"/>
-            <column name="age" valueNumeric="29"/>
-            <column name="salary" valueNumeric="80000.0"/>
-            <column name="employer_id" valueNumeric="3"/>
-        </insert>
-    </changeSet>
+    private String panNo;
+    private LocalDate estDate;
+    private String location;
 
-</databaseChangeLog>
+    @OneToMany(mappedBy = "employer", fetch = FetchType.LAZY)
+    private List<Employee> employees;
+
+    // Getters & Setters
+}
+
+Employee.java
+
+@Entity
+public class Employee {
+
+    @Id
+    private int empId;
+    private String name;
+    private int age;
+    private double salary;
+
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private Employer employer;
+
+    // Getters & Setters
+}
+
+
+---
+
+2. Add EntityGraph in EmployerRepository
+
+public interface EmployerRepository extends JpaRepository<Employer, Integer> {
+
+    // This EntityGraph fetches employees along with employers to avoid N+1 problem
+    @EntityGraph(attributePaths = "employees")
+    @Query("SELECT e FROM Employer e WHERE e.employerId = :id")
+    Optional<Employer> findWithEmployeesById(@Param("id") Integer id);
+}
+
+
+---
+
+3. Create a REST Controller to Test It
+
+EmployerController.java
+
+@RestController
+@RequestMapping("/employers")
+public class EmployerController {
+
+    @Autowired
+    private EmployerRepository employerRepository;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Employer> getEmployerWithEmployees(@PathVariable int id) {
+        Optional<Employer> employer = employerRepository.findWithEmployeesById(id);
+        return employer.map(ResponseEntity::ok)
+                       .orElse(ResponseEntity.notFound().build());
+    }
+}
+
+
+---
+
+4. Run the Program
+
+Use the HelloWorldSpringApplication.java with SpringApplication.run(...).
+
+Make sure your Liquibase has run and tables + data are created (check DB logs).
+
+Run the Spring Boot app from your IDE or using mvn spring-boot:run.
+
+
+
+---
+
+5. Test the Endpoint
+
+Open browser or Postman and go to:
+
+http://localhost:8080/employers/1
+
+You should get an output like:
+
+{
+  "employerId": 1,
+  "panNo": "ABC023",
+  "estDate": "2020-01-01",
+  "location": "Delhi",
+  "employees": [
+    { "empId": 1, "name": "Ankur", ... },
+    { "empId": 2, "name": "Anjali", ... },
+    ...
+  ]
+}
+
+This confirms the EntityGraph is working and fetching employees eagerly.
+
+
+---
+
+Let me know if you want a version that avoids circular references (like using DTOs or @JsonIgnore).
