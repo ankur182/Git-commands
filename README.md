@@ -1,17 +1,3 @@
-Thanks! Based on your JSON data and your use of H2 database with Liquibase, I’ll now help you generate a Liquibase changelog that:
-
-1. Creates employer and employee tables (One-to-Many).
-
-
-2. Inserts the initial data into both tables (with relationships preserved).
-
-
-
-
----
-
-Liquibase Changelog: db.changelog-master.xml
-
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -124,27 +110,3 @@ Liquibase Changelog: db.changelog-master.xml
     </changeSet>
 
 </databaseChangeLog>
-
-
----
-
-How to Use This File
-
-1. Place it in src/main/resources/db/changelog/db.changelog-master.xml.
-
-
-2. Update your application.properties:
-
-
-
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.jpa.hibernate.ddl-auto=none
-spring.liquibase.change-log=classpath:db/changelog/db.changelog-master.xml
-
-
----
-
-Would you like me to generate Java @Entity classes as well for Employer and Employee?
