@@ -1,40 +1,70 @@
-Got it! You want to:
+To achieve the goal of returning both Employee and Employer data for a given employee name in a GET endpoint, you need to:
 
-Create two DTOs: EmployeeData and EmployerData
-
-Extract data from Employee and Employer entities
-
-Return it via your controller as a JSON response
+1. Have a proper mapping between Employee and Employer entities (likely many-to-one).
 
 
+2. Use a DTO (Data Transfer Object) that combines the relevant fields.
 
----
 
-Step-by-Step Setup
+3. Implement the GET endpoint in the EmployeeController.
 
-1. DTO Classes
 
-EmployeeData.java
 
-package com.example.helloworld.model;
+Assuming your entity relationships are like this:
+
+Employee.java
+
+@Entity
+public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long empId;
+
+    private String name;
+    private int age;
+    private double salary;
+
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private Employer employer;
+
+    // getters and setters
+}
+
+Employer.java
+
+@Entity
+public class Employer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long employerId;
+
+    private String panNo;
+    private Date estDate;
+    private String location;
+
+    // getters and setters
+}
+
+EmployeeData.java (DTO)
 
 public class EmployeeData {
     private String name;
     private int age;
     private double salary;
+    private EmployerData employer;
 
-    public EmployeeData(String name, int age, double salary) {
+    public EmployeeData(String name, int age, double salary, EmployerData employer) {
         this.name = name;
         this.age = age;
         this.salary = salary;
+        this.employer = employer;
     }
 
-    // Getters and setters
+    // getters and setters
 }
 
-EmployerData.java
-
-package com.example.helloworld.model;
+EmployerData.java (DTO)
 
 public class EmployerData {
     private Long employerId;
@@ -45,67 +75,36 @@ public class EmployerData {
         this.panNo = panNo;
     }
 
-    // Getters and setters
+    // getters and setters
 }
 
-2. Controller Method
+EmployeeRepository.java
 
-In EmployeeController.java:
-
-@GetMapping("/employee/{name}")
-public ResponseEntity<?> getEmployeeByName(@PathVariable String name) {
-    Optional<Employee> optionalEmployee = employeeRepo.findByName(name);
-
-    if (optionalEmployee.isPresent()) {
-        Employee emp = optionalEmployee.get();
-
-        // Map to DTOs
-        EmployeeData employeeData = new EmployeeData(emp.getName(), emp.getAge(), emp.getSalary());
-
-        EmployerData employerData = null;
-        if (emp.getEmployer() != null) {
-            Employer employer = emp.getEmployer();
-            employerData = new EmployerData(employer.getEmployerId(), employer.getPanNo());
-        }
-
-        // Final response map
-        Map<String, Object> response = new HashMap<>();
-        response.put("employee", employeeData);
-        response.put("employer", employerData);
-
-        return ResponseEntity.ok(response);
-    } else {
-        Map<String, Object> error = new HashMap<>();
-        error.put("message", "Employee not found");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-    }
-}
-
-3. Repository Method
-
-In EmployeeRepository.java:
-
-@Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByName(String name);
 }
 
+EmployeeController.java
 
----
+@RestController
+public class EmployeeController {
 
-Output JSON
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
-{
-  "employee": {
-    "name": "Ankur",
-    "age": 25,
-    "salary": 60000.0
-  },
-  "employer": {
-    "employerId": 1,
-    "panNo": "ABCPK1234L"
-  }
+    @GetMapping("/employee/{name}")
+    public ResponseEntity<EmployeeData> getEmployeeByName(@PathVariable String name) {
+        Optional<Employee> optionalEmployee = employeeRepository.findByName(name);
+        if (optionalEmployee.isPresent()) {
+            Employee emp = optionalEmployee.get();
+            Employer empEmployer = emp.getEmployer();
+            EmployerData employerData = new EmployerData(empEmployer.getEmployerId(), empEmployer.getPanNo());
+            EmployeeData response = new EmployeeData(emp.getName(), emp.getAge(), emp.getSalary(), employerData);
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
 
-Let me know if you'd like to merge this into a single DTO or customize the response format.
-
+If you want me to verify the code in the uploaded file, please let me know which file you want me to look into or share the code snippet you want help with.
