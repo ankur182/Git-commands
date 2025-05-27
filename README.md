@@ -1,30 +1,77 @@
-Thanks for the update. Let's solve it cleanly.
+Got it! You want to:
+
+Create two DTOs: EmployeeData and EmployerData
+
+Extract data from Employee and Employer entities
+
+Return it via your controller as a JSON response
+
 
 
 ---
 
-Based on the image and description, here's the correct version of the method:
+Step-by-Step Setup
 
-Controller Fix:
+1. DTO Classes
 
-Change your method to this:
+EmployeeData.java
+
+package com.example.helloworld.model;
+
+public class EmployeeData {
+    private String name;
+    private int age;
+    private double salary;
+
+    public EmployeeData(String name, int age, double salary) {
+        this.name = name;
+        this.age = age;
+        this.salary = salary;
+    }
+
+    // Getters and setters
+}
+
+EmployerData.java
+
+package com.example.helloworld.model;
+
+public class EmployerData {
+    private Long employerId;
+    private String panNo;
+
+    public EmployerData(Long employerId, String panNo) {
+        this.employerId = employerId;
+        this.panNo = panNo;
+    }
+
+    // Getters and setters
+}
+
+2. Controller Method
+
+In EmployeeController.java:
 
 @GetMapping("/employee/{name}")
-public ResponseEntity<Map<String, Object>> getEmployeeByName(@PathVariable String name) {
-    Optional<Employee> optionalEmployee = employeeRepository.findByName(name);
+public ResponseEntity<?> getEmployeeByName(@PathVariable String name) {
+    Optional<Employee> optionalEmployee = employeeRepo.findByName(name);
 
     if (optionalEmployee.isPresent()) {
         Employee emp = optionalEmployee.get();
-        Map<String, Object> response = new HashMap<>();
-        response.put("name", emp.getName());
-        response.put("age", emp.getAge());
-        response.put("salary", emp.getSalary());
 
-        Employer employer = emp.getEmployer(); // make sure this is mapped in your entity
-        if (employer != null) {
-            response.put("employerId", employer.getEmployerId());
-            response.put("panNo", employer.getPanNo());
+        // Map to DTOs
+        EmployeeData employeeData = new EmployeeData(emp.getName(), emp.getAge(), emp.getSalary());
+
+        EmployerData employerData = null;
+        if (emp.getEmployer() != null) {
+            Employer employer = emp.getEmployer();
+            employerData = new EmployerData(employer.getEmployerId(), employer.getPanNo());
         }
+
+        // Final response map
+        Map<String, Object> response = new HashMap<>();
+        response.put("employee", employeeData);
+        response.put("employer", employerData);
 
         return ResponseEntity.ok(response);
     } else {
@@ -34,45 +81,31 @@ public ResponseEntity<Map<String, Object>> getEmployeeByName(@PathVariable Strin
     }
 }
 
-
----
-
-Required Adjustments in Entities:
-
-Employee.java
-
-Make sure the mapping is there:
-
-@ManyToOne(fetch = FetchType.LAZY)
-@JoinColumn(name = "employer_id")
-private Employer employer;
-
-Employer.java
-
-@OneToMany(mappedBy = "employer")
-private List<Employee> employees;
-
-
----
-
-Optional: Use @EntityGraph to Fetch Employer with Employee
+3. Repository Method
 
 In EmployeeRepository.java:
 
-@EntityGraph(attributePaths = {"employer"})
-Optional<Employee> findByName(String name);
+@Repository
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+    Optional<Employee> findByName(String name);
+}
 
 
 ---
 
-This will:
+Output JSON
 
-Fix your return type issue.
+{
+  "employee": {
+    "name": "Ankur",
+    "age": 25,
+    "salary": 60000.0
+  },
+  "employer": {
+    "employerId": 1,
+    "panNo": "ABCPK1234L"
+  }
+}
 
-Return employee details + employer ID and PAN.
-
-Avoid lazy loading issues using @EntityGraph.
-
-
-Let me know if you want a DTO-based cleaner approach too.
+Let me know if you'd like to merge this into a single DTO or customize the response format.
 
