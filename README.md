@@ -5,34 +5,14 @@ public ResponseEntity<?> detachEmployer(@PathVariable Integer id) {
         return ResponseEntity.notFound().build();
     }
 
-    entityManager.detach(employer); // CascadeType.DETACH detaches children too
+    entityManager.detach(employer);
 
-    // Store in-memory for demo purposes
+    boolean isDetached = !entityManager.contains(employer);
     this.detachedEmployer = employer;
 
-    return ResponseEntity.ok("Employer with ID " + id + " has been detached.");
-}
+    String message = isDetached
+            ? "✅ Employer with ID " + id + " has been successfully detached."
+            : "❌ Detach failed for Employer with ID " + id;
 
-
-
-ohkhhn
-
-
-
-@PostMapping("/employers/merge")
-public ResponseEntity<?> mergeEmployer() {
-    if (detachedEmployer == null) {
-        return ResponseEntity.badRequest().body("No detached employer found to merge.");
-    }
-
-    // Sample update (you could pass a body instead)
-    detachedEmployer.setLocation("MergedCity");
-    if (!detachedEmployer.getEmployees().isEmpty()) {
-        detachedEmployer.getEmployees().get(0).setSalary(99999.0);
-    }
-
-    Employer merged = entityManager.merge(detachedEmployer);
-    detachedEmployer = null; // Clear after merging
-
-    return ResponseEntity.ok(merged);
+    return ResponseEntity.ok(message);
 }
