@@ -16,3 +16,28 @@ public ResponseEntity<?> detachEmployer(@PathVariable Integer id) {
 
     return ResponseEntity.ok(message);
 }
+_-----++++++++--6-666667--+++---+-
+
+
+@PostMapping("/employers/merge")
+public ResponseEntity<?> mergeEmployer() {
+    if (detachedEmployer == null) {
+        return ResponseEntity.badRequest().body("❌ No detached employer found. Please call /detach first.");
+    }
+
+    // Example: Simulate an update before merge (you can skip this or accept updates via @RequestBody)
+    detachedEmployer.setLocation("UpdatedCity");
+    if (!detachedEmployer.getEmployees().isEmpty()) {
+        detachedEmployer.getEmployees().get(0).setSalary(75000.0); // Demo update
+    }
+
+    Employer merged = entityManager.merge(detachedEmployer);
+
+    // Optionally flush to force update now
+    entityManager.flush();
+
+    // Clear reference after merge
+    detachedEmployer = null;
+
+    return ResponseEntity.ok("✅ Detached Employer has been successfully merged and updated.");
+}
