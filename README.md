@@ -1,165 +1,174 @@
-// ProjectEntity.java package com.example.myapp.entity;
+Here's a minimal Spring Boot example with the complete flow:
 
-import jakarta.persistence.*; import java.util.List;
+> Employee → Repository → Service → Controller
 
-@Entity public class ProjectEntity { @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 
-private String projectName;
 
-@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-private List<TeamMemberEntity> team;
+This version:
 
-// Getters and setters
+Uses Spring Web and Spring Data JPA
 
+Saves employee data to a database using H2 (in-memory) or any DB of your choice
+
+
+
+---
+
+✅ 1. Employee.java (Entity)
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
+public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private int age;
+    private double salary;
+
+    // Constructors
+    public Employee() {}
+
+    public Employee(String name, int age, double salary) {
+        this.name = name;
+        this.age = age;
+        this.salary = salary;
+    }
+
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
+
+    public double getSalary() { return salary; }
+    public void setSalary(double salary) { this.salary = salary; }
 }
 
-// TeamMemberEntity.java package com.example.myapp.entity;
 
-import jakarta.persistence.*;
+---
 
-@Entity public class TeamMemberEntity { @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
+✅ 2. EmployeeRepository.java
 
-private String name;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@ManyToOne
-private RoleEntity role;
-
-@ManyToOne
-private ProjectEntity project;
-
-// Getters and setters
-
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+    // You can add custom queries if needed
 }
 
-// RoleEntity.java package com.example.myapp.entity;
 
-import jakarta.persistence.*;
+---
 
-@Entity public class RoleEntity { @Id private String code; private String name;
-
-public RoleEntity() {}
-
-public RoleEntity(String code, String name) {
-    this.code = code;
-    this.name = name;
-}
-
-// Getters and setters
-
-}
-
-// ProjectDTO.java package com.example.myapp.dto;
+✅ 3. EmployeeService.java
 
 import java.util.List;
 
-public class ProjectDTO { private String name; private List<TeamMemberDTO> members;
-
-// Getters and setters
-
+public interface EmployeeService {
+    Employee saveEmployee(Employee employee);
+    List<Employee> getAllEmployees();
 }
 
-// TeamMemberDTO.java package com.example.myapp.dto;
 
-public class TeamMemberDTO { private String name; private String role;
+---
 
-// Getters and setters
+✅ 4. EmployeeServiceImpl.java
 
-}
-
-// ProjectRepository.java package com.example.myapp.repository;
-
-import com.example.myapp.entity.ProjectEntity; import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {}
-
-// TeamMemberRepository.java package com.example.myapp.repository;
-
-import com.example.myapp.entity.TeamMemberEntity; import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Long> {}
-
-// ProjectMapper.java package com.example.myapp.mapper;
-
-import com.example.myapp.dto.; import com.example.myapp.entity.; import org.mapstruct.*; import java.util.List;
-
-@Mapper(componentModel = "spring") public interface ProjectMapper { @Mapping(source = "projectName", target = "name") @Mapping(source = "team", target = "members") ProjectDTO toDto(ProjectEntity entity);
-
-@Mapping(source = "name", target = "projectName")
-@Mapping(source = "members", target = "team")
-ProjectEntity toEntity(ProjectDTO dto);
-
-@Mapping(source = "role.name", target = "role")
-TeamMemberDTO toDto(TeamMemberEntity entity);
-
-@Mapping(source = "role", target = "role", qualifiedByName = "mapRole")
-TeamMemberEntity toEntity(TeamMemberDTO dto);
-
-@Named("mapRole")
-default RoleEntity mapRole(String name) {
-    return switch (name.toLowerCase()) {
-        case "developer" -> new RoleEntity("DEV", "Developer");
-        case "qa" -> new RoleEntity("QA", "QA Engineer");
-        default -> new RoleEntity("UNK", name);
-    };
-}
-
-}
-
-// ProjectService.java package com.example.myapp.service;
-
-import com.example.myapp.dto.ProjectDTO; import java.util.List;
-
-public interface ProjectService { ProjectDTO saveProject(ProjectDTO dto); List<ProjectDTO> getAllProjects(); }
-
-// ProjectServiceImpl.java package com.example.myapp.service;
-
-import com.example.myapp.dto.ProjectDTO; import com.example.myapp.entity.ProjectEntity; import com.example.myapp.mapper.ProjectMapper; import com.example.myapp.repository.ProjectRepository; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.stereotype.Service;
-
-import java.util.List; import java.util.stream.Collectors;
-
-@Service public class ProjectServiceImpl implements ProjectService {
-
-@Autowired
-private ProjectRepository projectRepository;
-
-@Autowired
-private ProjectMapper mapper;
-
-@Override
-public ProjectDTO saveProject(ProjectDTO dto) {
-    ProjectEntity entity = mapper.toEntity(dto);
-    entity.getTeam().forEach(member -> member.setProject(entity));
-    return mapper.toDto(projectRepository.save(entity));
-}
-
-@Override
-public List<ProjectDTO> getAllProjects() {
-    return projectRepository.findAll().stream()
-            .map(mapper::toDto)
-            .collect(Collectors.toList());
-}
-
-}
-
-// ProjectController.java package com.example.myapp.controller;
-
-import com.example.myapp.dto.ProjectDTO; import com.example.myapp.service.ProjectService; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.http.ResponseEntity; import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RestController @RequestMapping("/api/projects") public class ProjectController {
+@Service
+public class EmployeeServiceImpl implements EmployeeService {
 
-@Autowired
-private ProjectService projectService;
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
-@PostMapping
-public ResponseEntity<ProjectDTO> save(@RequestBody ProjectDTO dto) {
-    return ResponseEntity.ok(projectService.saveProject(dto));
+    @Override
+    public Employee saveEmployee(Employee employee) {
+        return employeeRepository.save(employee);
+    }
+
+    @Override
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
+    }
 }
 
-@GetMapping
-public ResponseEntity<List<ProjectDTO>> getAll() {
-    return ResponseEntity.ok(projectService.getAllProjects());
+
+---
+
+✅ 5. EmployeeController.java
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeService employeeService;
+
+    @PostMapping("/add")
+    public Employee addEmployee(@RequestBody Employee employee) {
+        return employeeService.saveEmployee(employee);
+    }
+
+    @GetMapping("/all")
+    public List<Employee> getAllEmployees() {
+        return employeeService.getAllEmployees();
+    }
 }
 
+
+---
+
+✅ 6. Sample JSON to Send via Postman
+
+POST http://localhost:8080/api/employees/add
+
+{
+  "name": "Ankur",
+  "age": 23,
+  "salary": 55000
 }
+
+
+---
+
+🛠️ Additional Config (If using H2 for testing)
+
+In application.properties:
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+spring.jpa.show-sql=true
+
+
+---
+
+Let me know if you want:
+
+Pagination
+
+Custom search (like by name)
+
+Integration with React frontend
+
