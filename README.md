@@ -1,291 +1,165 @@
-Great! Here's how to set up a complete Spring Boot application using:
+// ProjectEntity.java package com.example.myapp.entity;
 
-✅ Entity, DTO
+import jakarta.persistence.*; import java.util.List;
 
-✅ Repository
+@Entity public class ProjectEntity { @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 
-✅ Service
+private String projectName;
 
-✅ Controller
+@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<TeamMemberEntity> team;
 
-✅ MapStruct for mapping
+// Getters and setters
 
-
-
----
-
-🏗️ Use Case: Manage Projects and Team Members (with nested Role mapping)
-
-
----
-
-📁 Project Structure (Package Suggestions)
-
-com.example.projectmapstruct
-├── controller
-│   └── ProjectController.java
-├── dto
-│   ├── ProjectDTO.java
-│   └── TeamMemberDTO.java
-├── entity
-│   ├── ProjectEntity.java
-│   ├── RoleEntity.java
-│   └── TeamMemberEntity.java
-├── mapper
-│   └── ProjectMapper.java
-├── repository
-│   ├── ProjectRepository.java
-│   └── TeamMemberRepository.java
-├── service
-│   ├── ProjectService.java
-│   └── ProjectServiceImpl.java
-└── ProjectMapstructApplication.java
-
-
----
-
-✅ 1. Entity Classes (entity package)
-
-RoleEntity.java
-
-@Entity
-public class RoleEntity {
-    @Id
-    private String code;
-    private String name;
-
-    // Constructors, Getters, Setters
 }
 
-TeamMemberEntity.java
+// TeamMemberEntity.java package com.example.myapp.entity;
 
-@Entity
-public class TeamMemberEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+import jakarta.persistence.*;
 
-    private String fullName;
+@Entity public class TeamMemberEntity { @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private RoleEntity role;
+private String name;
 
-    @ManyToOne
-    private ProjectEntity project;
+@ManyToOne
+private RoleEntity role;
 
-    // Getters, Setters
+@ManyToOne
+private ProjectEntity project;
+
+// Getters and setters
+
 }
 
-ProjectEntity.java
+// RoleEntity.java package com.example.myapp.entity;
 
-@Entity
-public class ProjectEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+import jakarta.persistence.*;
 
-    private String projectName;
+@Entity public class RoleEntity { @Id private String code; private String name;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-    private List<TeamMemberEntity> team;
+public RoleEntity() {}
 
-    // Getters, Setters
+public RoleEntity(String code, String name) {
+    this.code = code;
+    this.name = name;
 }
 
+// Getters and setters
 
----
-
-✅ 2. DTOs (dto package)
-
-TeamMemberDTO.java
-
-public class TeamMemberDTO {
-    private Long id;
-    private String fullName;
-    private String role;
 }
 
-ProjectDTO.java
+// ProjectDTO.java package com.example.myapp.dto;
 
-public class ProjectDTO {
-    private Long id;
-    private String name;
-    private List<TeamMemberDTO> members;
+import java.util.List;
+
+public class ProjectDTO { private String name; private List<TeamMemberDTO> members;
+
+// Getters and setters
+
 }
 
+// TeamMemberDTO.java package com.example.myapp.dto;
 
----
+public class TeamMemberDTO { private String name; private String role;
 
-✅ 3. MapStruct Mapper (mapper package)
+// Getters and setters
 
-ProjectMapper.java
-
-@Mapper(componentModel = "spring")
-public interface ProjectMapper {
-    @Mapping(source = "projectName", target = "name")
-    @Mapping(source = "team", target = "members")
-    ProjectDTO toDto(ProjectEntity entity);
-
-    @Mapping(source = "name", target = "projectName")
-    @Mapping(source = "members", target = "team")
-    ProjectEntity toEntity(ProjectDTO dto);
-
-    @Mapping(source = "role.name", target = "role")
-    TeamMemberDTO toDto(TeamMemberEntity entity);
-
-    @Mapping(source = "role", target = "role", qualifiedByName = "mapRoleName")
-    TeamMemberEntity toEntity(TeamMemberDTO dto);
-
-    @Named("mapRoleName")
-    default RoleEntity mapRole(String roleName) {
-        switch (roleName.toLowerCase()) {
-            case "developer": return new RoleEntity("DEV", "Developer");
-            case "qa": return new RoleEntity("QA", "QA Engineer");
-            default: return new RoleEntity("UNK", roleName);
-        }
-    }
 }
 
+// ProjectRepository.java package com.example.myapp.repository;
 
----
-
-✅ 4. Repositories (repository package)
-
-ProjectRepository.java
+import com.example.myapp.entity.ProjectEntity; import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {}
 
-TeamMemberRepository.java
+// TeamMemberRepository.java package com.example.myapp.repository;
+
+import com.example.myapp.entity.TeamMemberEntity; import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TeamMemberRepository extends JpaRepository<TeamMemberEntity, Long> {}
 
+// ProjectMapper.java package com.example.myapp.mapper;
 
----
+import com.example.myapp.dto.; import com.example.myapp.entity.; import org.mapstruct.*; import java.util.List;
 
-✅ 5. Service Layer (service package)
+@Mapper(componentModel = "spring") public interface ProjectMapper { @Mapping(source = "projectName", target = "name") @Mapping(source = "team", target = "members") ProjectDTO toDto(ProjectEntity entity);
 
-ProjectService.java
+@Mapping(source = "name", target = "projectName")
+@Mapping(source = "members", target = "team")
+ProjectEntity toEntity(ProjectDTO dto);
 
-public interface ProjectService {
-    ProjectDTO saveProject(ProjectDTO dto);
-    List<ProjectDTO> getAllProjects();
+@Mapping(source = "role.name", target = "role")
+TeamMemberDTO toDto(TeamMemberEntity entity);
+
+@Mapping(source = "role", target = "role", qualifiedByName = "mapRole")
+TeamMemberEntity toEntity(TeamMemberDTO dto);
+
+@Named("mapRole")
+default RoleEntity mapRole(String name) {
+    return switch (name.toLowerCase()) {
+        case "developer" -> new RoleEntity("DEV", "Developer");
+        case "qa" -> new RoleEntity("QA", "QA Engineer");
+        default -> new RoleEntity("UNK", name);
+    };
 }
 
-ProjectServiceImpl.java
-
-@Service
-public class ProjectServiceImpl implements ProjectService {
-
-    @Autowired
-    private ProjectRepository projectRepository;
-
-    @Autowired
-    private ProjectMapper mapper;
-
-    @Override
-    public ProjectDTO saveProject(ProjectDTO dto) {
-        ProjectEntity entity = mapper.toEntity(dto);
-        entity.getTeam().forEach(member -> member.setProject(entity)); // set reverse ref
-        return mapper.toDto(projectRepository.save(entity));
-    }
-
-    @Override
-    public List<ProjectDTO> getAllProjects() {
-        return projectRepository.findAll().stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
-    }
 }
 
+// ProjectService.java package com.example.myapp.service;
 
----
+import com.example.myapp.dto.ProjectDTO; import java.util.List;
 
-✅ 6. Controller (controller package)
+public interface ProjectService { ProjectDTO saveProject(ProjectDTO dto); List<ProjectDTO> getAllProjects(); }
 
-ProjectController.java
+// ProjectServiceImpl.java package com.example.myapp.service;
 
-@RestController
-@RequestMapping("/api/projects")
-public class ProjectController {
+import com.example.myapp.dto.ProjectDTO; import com.example.myapp.entity.ProjectEntity; import com.example.myapp.mapper.ProjectMapper; import com.example.myapp.repository.ProjectRepository; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.stereotype.Service;
 
-    @Autowired
-    private ProjectService projectService;
+import java.util.List; import java.util.stream.Collectors;
 
-    @PostMapping
-    public ResponseEntity<ProjectDTO> saveProject(@RequestBody ProjectDTO dto) {
-        return ResponseEntity.ok(projectService.saveProject(dto));
-    }
+@Service public class ProjectServiceImpl implements ProjectService {
 
-    @GetMapping
-    public ResponseEntity<List<ProjectDTO>> getAllProjects() {
-        return ResponseEntity.ok(projectService.getAllProjects());
-    }
+@Autowired
+private ProjectRepository projectRepository;
+
+@Autowired
+private ProjectMapper mapper;
+
+@Override
+public ProjectDTO saveProject(ProjectDTO dto) {
+    ProjectEntity entity = mapper.toEntity(dto);
+    entity.getTeam().forEach(member -> member.setProject(entity));
+    return mapper.toDto(projectRepository.save(entity));
 }
 
-
----
-
-✅ 7. Main Class
-
-@SpringBootApplication
-public class ProjectMapstructApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(ProjectMapstructApplication.class, args);
-    }
+@Override
+public List<ProjectDTO> getAllProjects() {
+    return projectRepository.findAll().stream()
+            .map(mapper::toDto)
+            .collect(Collectors.toList());
 }
 
-
----
-
-✅ 8. Sample JSON for POST /api/projects
-
-{
-  "name": "AI Assistant",
-  "members": [
-    {
-      "fullName": "Ankur Gautam",
-      "role": "Developer"
-    },
-    {
-      "fullName": "Riya Sharma",
-      "role": "QA"
-    }
-  ]
 }
 
+// ProjectController.java package com.example.myapp.controller;
 
----
+import com.example.myapp.dto.ProjectDTO; import com.example.myapp.service.ProjectService; import org.springframework.beans.factory.annotation.Autowired; import org.springframework.http.ResponseEntity; import org.springframework.web.bind.annotation.*;
 
-🧾 Dependencies (Maven)
+import java.util.List;
 
-<dependency>
-    <groupId>org.mapstruct</groupId>
-    <artifactId>mapstruct</artifactId>
-    <version>1.5.5.Final</version>
-</dependency>
-<dependency>
-    <groupId>org.mapstruct</groupId>
-    <artifactId>mapstruct-processor</artifactId>
-    <version>1.5.5.Final</version>
-    <scope>provided</scope>
-</dependency>
+@RestController @RequestMapping("/api/projects") public class ProjectController {
 
-> ✅ Use lombok optionally to reduce boilerplate
-✅ Enable annotation processing in your IDE (important for MapStruct)
+@Autowired
+private ProjectService projectService;
 
+@PostMapping
+public ResponseEntity<ProjectDTO> save(@RequestBody ProjectDTO dto) {
+    return ResponseEntity.ok(projectService.saveProject(dto));
+}
 
+@GetMapping
+public ResponseEntity<List<ProjectDTO>> getAll() {
+    return ResponseEntity.ok(projectService.getAllProjects());
+}
 
-
----
-
-Would you like:
-
-A full working ZIP file (you can import to IntelliJ or VS Code)?
-
-This in Gradle version?
-
-Add tests using JUnit?
-
-
-Let me know!
-
+}
