@@ -1,43 +1,58 @@
-import java.util.Vector;
+import java.util.Stack;
 
-public class VectorOperations {
+public class StackOperations {
     public static void main(String[] args) {
-        // Create a Vector
-        Vector<String> names = new Vector<>();
+        // Create a Stack of Strings
+        Stack<String> books = new Stack<>();
 
-        // 1. Add Elements
-        names.add("Alice");
-        names.add("Bob");
-        names.add("Charlie");
-        names.add(1, "David"); // Insert at index 1
+        // 1. Push elements onto the stack
+        books.push("Java");
+        books.push("Python");
+        books.push("C++");
+        books.push("JavaScript");
 
-        // 2. Access Elements
-        System.out.println("Element at index 0: " + names.get(0)); // Alice
+        // 2. Peek at the top element
+        System.out.println("Top element (peek): " + books.peek()); // JavaScript
 
-        // 3. Update Element
-        names.set(2, "Eve"); // Replaces Charlie with Eve
+        // 3. Pop element from the stack
+        String removed = books.pop();
+        System.out.println("Removed element (pop): " + removed);   // JavaScript
 
-        // 4. Remove Elements
-        names.remove(1);        // Removes David
-        names.remove("Eve");    // Removes Eve
+        // 4. Check if stack is empty
+        System.out.println("Is the stack empty? " + books.isEmpty());
 
-        // 5. Size and Capacity
-        System.out.println("Current Size: " + names.size());
-        System.out.println("Current Capacity: " + names.capacity());
+        // 5. Size of the stack
+        System.out.println("Size of stack: " + books.size());
 
-        // 6. Check if Element Exists
-        if (names.contains("Alice")) {
-            System.out.println("Alice is present in the vector.");
+        // 6. Search for an element (1-based index from top)
+        int position = books.search("Python");
+        if (position != -1) {
+            System.out.println("Found 'Python' at position (from top): " + position);
+        } else {
+            System.out.println("'Python' not found.");
         }
 
-        // 7. Iterate using for-each loop
-        System.out.println("All Elements:");
-        for (String name : names) {
-            System.out.println(name);
+        // 7. Iterate through the stack (from bottom to top)
+        System.out.println("Current Stack elements:");
+        for (String book : books) {
+            System.out.println(book);
         }
 
-        // 8. Clear the Vector
-        names.clear();
-        System.out.println("After clearing, is the vector empty? " + names.isEmpty());
+        // 8. Clear the stack
+        books.clear();
+        System.out.println("After clearing, is the stack empty? " + books.isEmpty());
     }
 }
+
+
+output
+Top element (peek): JavaScript
+Removed element (pop): JavaScript
+Is the stack empty? false
+Size of stack: 3
+Found 'Python' at position (from top): 2
+Current Stack elements:
+Java
+Python
+C++
+After clearing, is the stack empty? true
