@@ -1,56 +1,57 @@
-import java.util.LinkedHashSet;
+import java.util.TreeSet;
 import java.util.Iterator;
 
-public class LinkedHashSetExample {
+public class TreeSetExample {
     public static void main(String[] args) {
-        // 1. Create a LinkedHashSet of Strings
-        LinkedHashSet<String> cities = new LinkedHashSet<>();
+        // 1. Create a TreeSet of Strings
+        TreeSet<String> names = new TreeSet<>();
 
-        // 2. Add elements
-        cities.add("Delhi");
-        cities.add("Mumbai");
-        cities.add("Chennai");
-        cities.add("Kolkata");
-        cities.add("Delhi"); // duplicate, won't be added
-        cities.add(null);    // one null allowed
-        cities.add(null);    // duplicate null won't be added
+        // 2. Add elements (automatically sorted)
+        names.add("Zara");
+        names.add("Ankit");
+        names.add("Mohan");
+        names.add("Ritika");
+        names.add("Ankit"); // Duplicate (ignored)
 
-        // 3. Print the set
-        System.out.println("LinkedHashSet elements (insertion order): " + cities);
+        // names.add(null); // Uncommenting this throws NullPointerException
 
-        // 4. Check if element exists
-        System.out.println("Contains 'Mumbai'? " + cities.contains("Mumbai"));
+        // 3. Print TreeSet (sorted)
+        System.out.println("Sorted names in TreeSet: " + names);
 
-        // 5. Remove an element
-        cities.remove("Chennai");
-        System.out.println("After removing 'Chennai': " + cities);
+        // 4. First and Last Elements
+        System.out.println("First: " + names.first());
+        System.out.println("Last: " + names.last());
 
-        // 6. Size and isEmpty
-        System.out.println("Size: " + cities.size());
-        System.out.println("Is empty? " + cities.isEmpty());
+        // 5. Check if contains
+        System.out.println("Contains 'Mohan'? " + names.contains("Mohan"));
 
-        // 7. Iterate using for-each loop
-        System.out.println("Iterating over elements:");
-        for (String city : cities) {
-            System.out.println(city);
+        // 6. Remove an element
+        names.remove("Ritika");
+        System.out.println("After removing Ritika: " + names);
+
+        // 7. Iterate
+        System.out.println("Iterating over TreeSet:");
+        for (String name : names) {
+            System.out.println(name);
         }
 
-        // 8. Clear the set
-        cities.clear();
-        System.out.println("After clearing, is empty? " + cities.isEmpty());
+        // 8. Clear
+        names.clear();
+        System.out.println("Is TreeSet empty after clearing? " + names.isEmpty());
     }
 }
 
 
-LinkedHashSet elements (insertion order): [Delhi, Mumbai, Chennai, Kolkata, null]
-Contains 'Mumbai'? true
-After removing 'Chennai': [Delhi, Mumbai, Kolkata, null]
-Size: 4
-Is empty? false
-Iterating over elements:
-Delhi
-Mumbai
-Kolkata
-null
-After clearing, is empty? true
 
+
+
+Sorted names in TreeSet: [Ankit, Mohan, Ritika, Zara]
+First: Ankit
+Last: Zara
+Contains 'Mohan'? true
+After removing Ritika: [Ankit, Mohan, Zara]
+Iterating over TreeSet:
+Ankit
+Mohan
+Zara
+Is TreeSet empty after clearing? true
