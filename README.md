@@ -1,35 +1,42 @@
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Iterator;
 
-public class LinkedHashMapExample {
+public class HashSetExample {
     public static void main(String[] args) {
-        // 1. Create a LinkedHashMap
-        LinkedHashMap<Integer, String> students = new LinkedHashMap<>();
+        // 1. Create a HashSet of Strings
+        HashSet<String> fruits = new HashSet<>();
 
-        // 2. Add key-value pairs
-        students.put(101, "Alice");
-        students.put(102, "Bob");
-        students.put(103, "Charlie");
-        students.put(null, "NullKey");
-        students.put(104, null); // null value
+        // 2. Add elements (duplicates won't be added)
+        fruits.add("Apple");
+        fruits.add("Banana");
+        fruits.add("Mango");
+        fruits.add("Orange");
+        fruits.add("Banana"); // duplicate
+        fruits.add(null);     // null allowed
+        fruits.add(null);     // only one null allowed
 
-        // 3. Access values
-        System.out.println("Student with ID 102: " + students.get(102));
-        System.out.println("Value of null key: " + students.get(null));
+        // 3. Print the set
+        System.out.println("HashSet elements: " + fruits);
 
-        // 4. Check presence
-        System.out.println("Contains key 103? " + students.containsKey(103));
-        System.out.println("Contains value 'Bob'? " + students.containsValue("Bob"));
+        // 4. Check if set contains an element
+        System.out.println("Contains 'Apple'? " + fruits.contains("Apple"));
 
-        // 5. Iterate using entrySet
-        System.out.println("\nAll entries in insertion order:");
-        for (Map.Entry<Integer, String> entry : students.entrySet()) {
-            System.out.println("ID: " + entry.getKey() + ", Name: " + entry.getValue());
+        // 5. Remove an element
+        fruits.remove("Mango");
+        System.out.println("After removing 'Mango': " + fruits);
+
+        // 6. Size of the set
+        System.out.println("Size: " + fruits.size());
+
+        // 7. Iterate using iterator
+        System.out.println("Iterating using iterator:");
+        Iterator<String> it = fruits.iterator();
+        while (it.hasNext()) {
+            System.out.println(it.next());
         }
 
-        // 6. Size and clear
-        System.out.println("\nSize before clear: " + students.size());
-        students.clear();
-        System.out.println("Is map empty? " + students.isEmpty());
+        // 8. Clear the set
+        fruits.clear();
+        System.out.println("After clearing, is empty? " + fruits.isEmpty());
     }
 }
