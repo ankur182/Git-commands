@@ -1,54 +1,56 @@
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Iterator;
 
-public class HashSetExample {
+public class LinkedHashSetExample {
     public static void main(String[] args) {
-        // 1. Create a HashSet of Strings
-        HashSet<String> fruits = new HashSet<>();
+        // 1. Create a LinkedHashSet of Strings
+        LinkedHashSet<String> cities = new LinkedHashSet<>();
 
-        // 2. Add elements (duplicates won't be added)
-        fruits.add("Apple");
-        fruits.add("Banana");
-        fruits.add("Mango");
-        fruits.add("Orange");
-        fruits.add("Banana"); // duplicate
-        fruits.add(null);     // null allowed
-        fruits.add(null);     // only one null allowed
+        // 2. Add elements
+        cities.add("Delhi");
+        cities.add("Mumbai");
+        cities.add("Chennai");
+        cities.add("Kolkata");
+        cities.add("Delhi"); // duplicate, won't be added
+        cities.add(null);    // one null allowed
+        cities.add(null);    // duplicate null won't be added
 
         // 3. Print the set
-        System.out.println("HashSet elements: " + fruits);
+        System.out.println("LinkedHashSet elements (insertion order): " + cities);
 
-        // 4. Check if set contains an element
-        System.out.println("Contains 'Apple'? " + fruits.contains("Apple"));
+        // 4. Check if element exists
+        System.out.println("Contains 'Mumbai'? " + cities.contains("Mumbai"));
 
         // 5. Remove an element
-        fruits.remove("Mango");
-        System.out.println("After removing 'Mango': " + fruits);
+        cities.remove("Chennai");
+        System.out.println("After removing 'Chennai': " + cities);
 
-        // 6. Size of the set
-        System.out.println("Size: " + fruits.size());
+        // 6. Size and isEmpty
+        System.out.println("Size: " + cities.size());
+        System.out.println("Is empty? " + cities.isEmpty());
 
-        // 7. Iterate using iterator
-        System.out.println("Iterating using iterator:");
-        Iterator<String> it = fruits.iterator();
-        while (it.hasNext()) {
-            System.out.println(it.next());
+        // 7. Iterate using for-each loop
+        System.out.println("Iterating over elements:");
+        for (String city : cities) {
+            System.out.println(city);
         }
 
         // 8. Clear the set
-        fruits.clear();
-        System.out.println("After clearing, is empty? " + fruits.isEmpty());
+        cities.clear();
+        System.out.println("After clearing, is empty? " + cities.isEmpty());
     }
 }
 
 
-HashSet elements: [null, Apple, Orange, Banana, Mango]
-Contains 'Apple'? true
-After removing 'Mango': [null, Apple, Orange, Banana]
+LinkedHashSet elements (insertion order): [Delhi, Mumbai, Chennai, Kolkata, null]
+Contains 'Mumbai'? true
+After removing 'Chennai': [Delhi, Mumbai, Kolkata, null]
 Size: 4
-Iterating using iterator:
+Is empty? false
+Iterating over elements:
+Delhi
+Mumbai
+Kolkata
 null
-Apple
-Orange
-Banana
 After clearing, is empty? true
+
