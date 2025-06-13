@@ -40,3 +40,15 @@ public class HashSetExample {
         System.out.println("After clearing, is empty? " + fruits.isEmpty());
     }
 }
+
+
+HashSet elements: [null, Apple, Orange, Banana, Mango]
+Contains 'Apple'? true
+After removing 'Mango': [null, Apple, Orange, Banana]
+Size: 4
+Iterating using iterator:
+null
+Apple
+Orange
+Banana
+After clearing, is empty? true
