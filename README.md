@@ -1,57 +1,81 @@
-import java.util.TreeSet;
-import java.util.Iterator;
+✅ What is a Lambda Expression in Java?
 
-public class TreeSetExample {
+A Lambda expression in Java is a short block of code that takes in parameters and returns a value. Lambda expressions are used primarily to define inline implementations of functional interfaces.
+
+Introduced in Java 8, it allows us to treat function as method argument or treat code as data.
+
+
+---
+
+📌 Syntax of Lambda Expression
+
+(parameters) -> { body }
+
+If there is only one statement, you can skip the curly braces {} and the return keyword.
+
+
+---
+
+✅ Example 1: Basic Lambda Expression (No Return)
+
+@FunctionalInterface
+interface Greeting {
+    void sayHello();
+}
+
+public class LambdaExample {
     public static void main(String[] args) {
-        // 1. Create a TreeSet of Strings
-        TreeSet<String> names = new TreeSet<>();
-
-        // 2. Add elements (automatically sorted)
-        names.add("Zara");
-        names.add("Ankit");
-        names.add("Mohan");
-        names.add("Ritika");
-        names.add("Ankit"); // Duplicate (ignored)
-
-        // names.add(null); // Uncommenting this throws NullPointerException
-
-        // 3. Print TreeSet (sorted)
-        System.out.println("Sorted names in TreeSet: " + names);
-
-        // 4. First and Last Elements
-        System.out.println("First: " + names.first());
-        System.out.println("Last: " + names.last());
-
-        // 5. Check if contains
-        System.out.println("Contains 'Mohan'? " + names.contains("Mohan"));
-
-        // 6. Remove an element
-        names.remove("Ritika");
-        System.out.println("After removing Ritika: " + names);
-
-        // 7. Iterate
-        System.out.println("Iterating over TreeSet:");
-        for (String name : names) {
-            System.out.println(name);
-        }
-
-        // 8. Clear
-        names.clear();
-        System.out.println("Is TreeSet empty after clearing? " + names.isEmpty());
+        Greeting greet = () -> System.out.println("Hello from Lambda!");
+        greet.sayHello();
     }
 }
 
 
+---
+
+✅ Example 2: Lambda with Parameters and Return
+
+@FunctionalInterface
+interface Add {
+    int sum(int a, int b);
+}
+
+public class LambdaExample {
+    public static void main(String[] args) {
+        Add addition = (a, b) -> a + b;
+        System.out.println("Sum: " + addition.sum(5, 3));  // Output: 8
+    }
+}
+
+
+---
+
+✅ Example 3: Lambda with Collection (Using forEach)
+
+import java.util.*;
+
+public class LambdaListExample {
+    public static void main(String[] args) {
+        List<String> list = Arrays.asList("Apple", "Banana", "Mango");
+
+        list.forEach(item -> System.out.println("Fruit: " + item));
+    }
+}
+
+
+---
+
+✅ Key Points
+
+Lambda expressions can only be used with functional interfaces (interface with only one abstract method).
+
+Makes code concise and readable.
+
+Often used with streams, collections, and functional programming.
 
 
 
-Sorted names in TreeSet: [Ankit, Mohan, Ritika, Zara]
-First: Ankit
-Last: Zara
-Contains 'Mohan'? true
-After removing Ritika: [Ankit, Mohan, Zara]
-Iterating over TreeSet:
-Ankit
-Mohan
-Zara
-Is TreeSet empty after clearing? true
+---
+
+Would you like examples with threads, sorting with lambda, or streams too?
+
