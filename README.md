@@ -1,97 +1,84 @@
-Let’s solve all 4 questions based on the image and instructions.
+Here's the solution to the lab exercise on "Using Subqueries to Solve Queries" from your image.
 
 
 ---
 
-✅ 1. Display:
+✅ 1. Last name and salary of employees in the same department as Nancy
 
-Last name in uppercase
-
-Length of the last name
-
-Job ID from the 4th character
-
-
-SELECT 
-    UPPER(last_name) AS upper_last_name,
-    LENGTH(last_name) AS last_name_length,
-    SUBSTR(job_id, 4) AS job_id_from_4th
-FROM employees;
-
-
----
-
-✅ 2. Display:
-
-Employee ID
-
-First name
-
-Salary
-
-Salary increased by 10% (as a whole number, column named New_Sal)
-
-
-SELECT 
-    employee_id,
-    first_name,
-    salary,
-    ROUND(salary * 1.10) AS New_Sal
-FROM employees;
-
-
----
-
-✅ 3. Display:
-
-First name
-
-Number of months worked (rounded)
-
-Sorted by months worked
-
-
-SELECT 
-    first_name,
-    ROUND(MONTHS_BETWEEN(SYSDATE, hire_date)) AS months_worked
+SELECT last_name, salary
 FROM employees
-ORDER BY months_worked DESC;
+WHERE department_id = (
+    SELECT department_id
+    FROM employees
+    WHERE first_name = 'Nancy'
+);
 
 
 ---
 
-✅ 4. Display:
+✅ 2. Employees whose salary is greater than the average salary
 
-Employee ID
-
-Hire date formatted like "Seventeenth of June 1994 12:00:00 AM"
-
-Salary as $15,000
-
-
-SELECT 
-    employee_id,
-    TO_CHAR(hire_date, 'fmDdth "of" Month YYYY "12:00:00 AM"') AS "Hired On",
-    TO_CHAR(salary, '$99,999') AS "Earns"
-FROM employees;
+SELECT employee_id, last_name, salary
+FROM employees
+WHERE salary > (
+    SELECT AVG(salary)
+    FROM employees
+);
 
 
 ---
 
-📌 Sample Output (as shown in image for Q4):
+✅ 3. Last name, department number, salary of employees in location ID 1400
 
-EMPLOYEE_ID	Hired On	Earns
-
-100	Seventeenth of June 1987 12:00:00 AM	$24,000
-101	Twenty-First of September 1989 12:00:00 AM	$22,000
-102	Thirteenth of January 1993 12:00:00 AM	$17,000
-103	Third of January 1990 12:00:00 AM	$20,000
-104	Twenty-First of May 1991 12:00:00 AM	$6,000
-105	Twenty-Fifth of June 1992 12:00:00 AM	$12,000
-
+SELECT last_name, department_id, salary
+FROM employees
+WHERE department_id IN (
+    SELECT department_id
+    FROM departments
+    WHERE location_id = 1400
+);
 
 
 ---
 
-Let me know if you want me to convert this into a .sql or .pdf file for submission.
+✅ 4. Last name, department number, salary of employees who report to Hunner
+
+SELECT last_name, department_id, salary
+FROM employees
+WHERE manager_id = (
+    SELECT employee_id
+    FROM employees
+    WHERE last_name = 'Hunner'
+);
+
+
+---
+
+✅ 5. Last name, job ID, and manager ID of employees in the Marketing department
+
+SELECT last_name, job_id, manager_id
+FROM employees
+WHERE department_id = (
+    SELECT department_id
+    FROM departments
+    WHERE department_name = 'Marketing'
+);
+
+
+---
+
+✅ 6. Last name, department ID, and salary of employees whose department ID and salary match any employee earning a commission
+
+SELECT last_name, department_id, salary
+FROM employees
+WHERE (department_id, salary) IN (
+    SELECT department_id, salary
+    FROM employees
+    WHERE commission_pct IS NOT NULL
+);
+
+
+---
+
+Let me know if you want an ER diagram or want to test these on a sample database like Oracle HR schema.
 
