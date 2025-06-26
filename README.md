@@ -1,99 +1,56 @@
-Thanks for the image and clarification. Here's how you can implement the task in Java.
+private void LoadEmailMatrix()
+{
+    Logger.LogInformation("LoadEmailMatrixExcelData - start");
 
+    var filePath = EmailMatrixConstants.ExcelTemplatePath;
+    if (!File.Exists(filePath))
+        throw new FileNotFoundException($"Excel file is missing: {filePath}");
 
----
+    using var package = new ExcelPackage(new FileInfo(filePath));
+    var worksheet = package.Workbook.Worksheets[EmailMatrixConstants.WorksheetName];
 
-✅ Problem Summary
+    var siteNames = ExcelHelper.ReadRowStrings(worksheet, EmailMatrixConstants.SiteNameRangeName);
+    var notifNames = ExcelHelper.ReadRowStrings(worksheet, EmailMatrixConstants.NotifNameRangeName);
 
-Create a Map of Ride objects.
+    Logger.LogInformation("LoadEmailMatrixExcelData - headers read");
 
-Key = hashCode() of each Ride object.
+    CheckValidNames(siteNames, notifNames);
 
-Value = the Ride object itself.
+    var matrixRange = worksheet.Names[EmailMatrixConstants.MatrixRangeName].Offset(1, 0);
+    var notifEmailList = new List<EmailMatrixNotificationDTO>();
 
-Then, count how many rides are booked from a particular source (e.g., "Malad").
+    for (int siteIndex = 0; siteIndex < siteNames.Count; siteIndex++)
+    {
+        for (int notifIndex = 0; notifIndex < notifNames.Count; notifIndex++)
+        {
+            var email = matrixRange.GetValue(siteIndex, notifIndex)?.ToString().Trim();
 
+            if (!RegexHelper.IsValidMailObject(email))
+                throw new ArgumentException($"Invalid email: {email}");
 
-
----
-
-✅ Step-by-Step Java Code
-
-import java.util.*;
-
-class Ride {
-    String source;
-    String destination;
-    double fare;
-
-    // Constructor
-    public Ride(String source, String destination, double fare) {
-        this.source = source;
-        this.destination = destination;
-        this.fare = fare;
+            notifEmailList.Add(new EmailMatrixNotificationDTO
+            {
+                SITENAME = siteNames[siteIndex],
+                NOTIFICATIONTYPEID = notifNames[notifIndex],
+                EMAILADDRESS = email
+            });
+        }
     }
 
-    // Override hashCode (optional but good practice)
-    @Override
-    public int hashCode() {
-        return Objects.hash(source, destination, fare);
-    }
-
-    // Optional: to print Ride object
-    @Override
-    public String toString() {
-        return "Ride{" + "source='" + source + "', destination='" + destination + "', fare=" + fare + '}';
-    }
+    _emailMatrixRepo.SaveEmailMatrix(notifEmailList);
+    Logger.LogInformation("LoadEmailMatrixExcelData - completed");
 }
 
-public class RideMapExample {
+private void CheckValidNames(List<string> siteNames, List<string> notifNames)
+{
+    var validSites = _siteRepo.GetAllSites();
+    var validNotifs = _notifRepo.GetAllNotificationTypes();
 
-    public static void main(String[] args) {
-        // Create list of rides
-        List<Ride> rideList = Arrays.asList(
-            new Ride("Malad", "Thane", 200),
-            new Ride("Andheri", "Borivali", 150),
-            new Ride("Malad", "Kandivali", 120),
-            new Ride("Malad", "Andheri", 180),
-            new Ride("Thane", "Malad", 220)
-        );
+    var invalidSites = siteNames.Except(validSites).ToList();
+    if (invalidSites.Any())
+        throw new ArgumentException("Invalid site names: " + string.Join(", ", invalidSites));
 
-        // Create map with hashCode as key and Ride object as value
-        Map<Integer, Ride> rideMap = new HashMap<>();
-        for (Ride ride : rideList) {
-            rideMap.put(ride.hashCode(), ride);
-        }
-
-        // Function to count rides from a specific source
-        String searchSource = "Malad";
-        int count = 0;
-        for (Ride ride : rideMap.values()) {
-            if (ride.source.equalsIgnoreCase(searchSource)) {
-                count++;
-            }
-        }
-
-        System.out.println("Number of rides booked from source '" + searchSource + "': " + count);
-    }
+    var invalidNotifs = notifNames.Except(validNotifs).ToList();
+    if (invalidNotifs.Any())
+        throw new ArgumentException("Invalid notification types: " + string.Join(", ", invalidNotifs));
 }
-
-
----
-
-✅ Output (for above data):
-
-Number of rides booked from source 'Malad': 3
-
-
----
-
-🔎 Key Concepts Used:
-
-HashMap<Integer, Ride> to store hashcode → object
-
-hashCode() ensures unique keys
-
-Counting rides from a given source using ride.source.equalsIgnoreCase(searchSource)
-
-
-Let me know if you want to add sorting, filtering by fare, or convert this to a Spring Boot or web app.
