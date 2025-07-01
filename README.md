@@ -1,37 +1,3 @@
-Project
-Gradle - GroovyGradle - KotlinMaven
-Language
-JavaKotlinGroovy
-Spring Boot
-4.0.0 (SNAPSHOT)3.5.4 (SNAPSHOT)3.5.33.4.8 (SNAPSHOT)3.4.73.3.13
-Project Metadata
-Group
-com.chat
-Artifact
-app
-Name
-app
-Description
-Demo project for Spring Boot
-Package name
-com.chat.app
-Packaging
-JarWar
-Java
-242117
-DependenciesAdd ...
-Spring Web Web
-Build web, including RESTful, applications using Spring MVC. Uses Apache Tomcat as the default embedded container.
-WebSocket Messaging
-Build Servlet-based WebSocket applications with SockJS and STOMP.
-Lombok Developer Tools
-Java annotation library which helps to reduce boilerplate code.
-Thymeleaf Template Engines
-A modern server-side Java template engine for both web and standalone environments. Allows HTML to be correctly displayed in browsers and as static prototypes.
-GenerateExplore...
-
-pom.xml
-<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -118,3 +84,4 @@ pom.xml
   </build>
 
 </project>
+
