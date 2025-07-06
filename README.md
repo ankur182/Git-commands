@@ -85,3 +85,33 @@
 	</build>
 
 </project>
+
+
+_----------------------
+Here’s a formal email you can send to accept the offer. (Don't worry, this image is private and will not be shared anywhere.)
+
+
+---
+
+Subject: Acceptance of Full-Time Employment Offer
+
+Dear Shahana Ma’am,
+
+Thank you for extending the opportunity to join BNP Paribas India Solutions as a Full-Time Associate Software Engineer.
+
+I am delighted to formally accept the offer. I confirm my acceptance of the position, effective from August 28, 2025, with the offered fixed compensation of INR 7,50,000 per annum and the location as Mumbai.
+
+I will ensure to complete the registration on the BWelcome portal using the same personal email address used for the hackathon and will follow the instructions as mentioned.
+
+Thank you once again for this opportunity. I look forward to contributing and growing with BNP Paribas.
+
+Warm regards,
+Ankur Gautam
+[Your Contact Number]
+[Your Email ID]
+
+
+---
+
+Let me know if you want to add any attachments or change the tone (e.g., more enthusiastic or concise).
+
