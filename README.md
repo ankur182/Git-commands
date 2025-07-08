@@ -1,1 +1,1 @@
-"Avoid making interfaces extend Singleton. Interfaces should define behavior contracts only, not lifecycle or instantiation logic. If needed, implement Singleton at the concrete class level or via a dependency injection container.
+Consider converting UserJurisdiction to a Java record since it is an immutable data-holder with final fields. Records automatically generate constructors, getters, equals(), hashCode(), and toString() methods, reducing boilerplate
