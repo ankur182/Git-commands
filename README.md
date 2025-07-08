@@ -1,1 +1,1 @@
-Usage of `io.vavr.Tuple` is not allowed — should be replaced with `org.apache.commons.lang3.tuple.Pair` as per project standards.
+Inconsistent or incorrect use of annotation for dependency injection. @Component is Spring-specific, whereas @Named is Jakarta EE compliant. This can cause bean resolution conflicts or make the app incompatible with Jakarta CDI environments.
