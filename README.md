@@ -1,1 +1,1 @@
-Domain logic is currently placed under the infrastructure layer (infrastructure.persistence.adapters). This violates layered architecture principles. Domain logic should reside in the domain layer to maintain modularity, reusability, and testability.
+"Avoid making interfaces extend Singleton. Interfaces should define behavior contracts only, not lifecycle or instantiation logic. If needed, implement Singleton at the concrete class level or via a dependency injection container.
