@@ -1,1 +1,1 @@
-Inconsistent or incorrect use of annotation for dependency injection. @Component is Spring-specific, whereas @Named is Jakarta EE compliant. This can cause bean resolution conflicts or make the app incompatible with Jakarta CDI environments.
+Domain logic is currently placed under the infrastructure layer (infrastructure.persistence.adapters). This violates layered architecture principles. Domain logic should reside in the domain layer to maintain modularity, reusability, and testability.
