@@ -1,1 +1,1 @@
-Accessing tuple values using `_1` and `_2` — should use `getLeft()` and `getRight()` as per `Pair` class convention.
+Usage of `io.vavr.Tuple` is not allowed — should be replaced with `org.apache.commons.lang3.tuple.Pair` as per project standards.
