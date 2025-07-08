@@ -1,1 +1,1 @@
-Inconsistent or unclear approach for mocking authentication — suggestion to continue using `@WithJsonWebToken` for consistency and role-based control.
+Consider replacing `Tuple.of(...)` with `Pair.of(...)` to follow standard conventions or align with library usage across the codebase. This improves consistency and avoids confusion between similar constructs.
