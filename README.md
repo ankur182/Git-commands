@@ -1,1 +1,1 @@
-Consider replacing `Tuple.of(...)` with `Pair.of(...)` to follow standard conventions or align with library usage across the codebase. This improves consistency and avoids confusion between similar constructs.
+Accessing tuple values using `_1` and `_2` — should use `getLeft()` and `getRight()` as per `Pair` class convention.
