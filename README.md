@@ -1,1 +1,1 @@
-Incorrect use of HTTP status code `500` for test scenario — use of 404, 403, or 428 is more appropriate for client errors.
+Unused mock field `currentAuthenticationPort` declared — results in unnecessary clutter in test class.
