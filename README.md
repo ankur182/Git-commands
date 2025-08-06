@@ -5,6 +5,7 @@ Since stepping into the corporate environment, my interest has shifted more towa
 
 Outside of work, I’ve recently picked up gymming, which has helped me maintain a healthy routine — though it's tough to always eat clean in a city like Mumbai! I also enjoy playing sports with my colleagues.
 I’m always eager to learn, take ownership, and grow both technically and personally.
+
 --------------------------------------
 
 🔹 Agenda Breakdown & What to Expect
