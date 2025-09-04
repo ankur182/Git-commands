@@ -69,3 +69,47 @@ Show willingness to take ownership while being a team player.
 
 “Time management and clear communication are two habits I’ve been working on since college, and I’d like to keep improving here.”
 
+
+
+
+
+
+..
+
+
+
+public Asset abandonOrRecoverAsset(String assetId, boolean abandon) throws AssetNotFoundException {
+    String performedBy = authenticatedUser.getCurrentUser();
+    Asset asset = findOrUpdateAssetByIdForWrite(assetId)
+        .orElseThrow(() -> new AssetNotFoundException(assetId));
+
+    AssetStatus previousAssetStatus = asset.getAssetStatus();
+    TargetType targetType;
+    ActionType actionType;
+
+    if (abandon) {
+        asset.setAssetStatus(AssetStatus.ABANDONED, Clock.now(), performedBy);
+        targetType = TargetType.ABANDONED;
+        actionType = ActionType.UPDATE;
+    } else {
+        asset.setAssetStatus(AssetStatus.RECOVERED, Clock.now(), performedBy);
+        targetType = TargetType.RECOVERED;
+        actionType = ActionType.UPDATE;
+    }
+
+    // ✅ Build EventDetail set
+    Set<EventDetail> details = Set.of(
+        EventDetail.builder()
+            .eventDetailType(EventDetailType.ASSET_STATUS)
+            .value(targetType.name())   // "ABANDONED" or "RECOVERED"
+            .build()
+    );
+
+    // ✅ Save audit trail
+    auditTrailPort.save(
+        buildAuditTrail(asset, TargetType.ASSET_STATUS, actionType, details)
+    );
+
+    eventPublisher.publishEvents(modAsset);
+    return asset;
+}
